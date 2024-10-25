@@ -16,17 +16,9 @@ def index_to_char(index):
 
 # Функция шифрования по алгоритму Бофора
 def beaufort_encrypt(plaintext, key):
-    ciphertext = []
-    for i, char in enumerate(plaintext):
-        if char in ALPHABET:
-            key_char = key[i % len(key)]
-            key_index = char_to_index(key_char)
-            text_index = char_to_index(char)
-            encrypted_index = (key_index - text_index) % ALPHABET_SIZE
-            ciphertext.append(index_to_char(encrypted_index))
-        else:
-            ciphertext.append(char)
-    return ''.join(ciphertext)
+    k = (key*(len(plaintext))+key)[:len(plaintext)] # подгоняем ключ
+    c = ''.join([chr(((ord(k[i]) - ord(plaintext[i])) % 26)+ord("a")) for i in range(len(plaintext))]) # шифруем
+    return c
 
 # Функция дешифрования по алгоритму Бофора (та же, что и для шифрования)
 def beaufort_decrypt(ciphertext, key):
