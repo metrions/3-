@@ -1,9 +1,10 @@
 import tkinter as tk
+import re
 from tkinter import filedialog, messagebox
 import string
 
 # Генерация алфавита с символом '_'
-ALPHABET = string.ascii_lowercase + '_'
+ALPHABET = 'abcdefghijklmnopqrstuvwxyz_'
 ALPHABET_SIZE = len(ALPHABET)
 
 # Преобразование символа в индекс
@@ -14,10 +15,11 @@ def char_to_index(char):
 def index_to_char(index):
     return ALPHABET[index % ALPHABET_SIZE]
 
-# Функция шифрования по алгоритму Бофора
+# Функция шифрования
 def beaufort_encrypt(plaintext, key):
-    k = (key*(len(plaintext))+key)[:len(plaintext)] # подгоняем ключ
-    c = ''.join(['_' if plaintext[i] == '_' else chr(((ord(k[i]) - ord(plaintext[i])) % 26) + ord('a')) for i in range(len(plaintext))])
+    # Подгоняем длину ключа
+    k = (key * (len(plaintext)) + key)[:len(plaintext)] 
+    c = ''.join([index_to_char((char_to_index(k[i]) - char_to_index(plaintext[i])) % ALPHABET_SIZE) for i in range(len(plaintext))])
 
     return c
 
@@ -162,6 +164,12 @@ class BoforApp(tk.Tk):
 
         with open(filepath, 'r') as file:
             encoded_sequence = file.read().strip()
+
+            # Проверка, что последовательность содержит только символы a-z и _
+            if not re.fullmatch(r'[a-z_]+', encoded_sequence):
+                messagebox.showerror("Error", "Последовательность должна содержать только символы a-z и _")
+                return
+            
             self.sequence_entry.delete(0, tk.END)
             self.sequence_entry.insert(0, encoded_sequence)
     
@@ -173,6 +181,10 @@ class BoforApp(tk.Tk):
 
         with open(filepath, 'r') as file:
             key_entry = file.read().strip()
+            # Проверка, что ключ содержит только символы a-z и _
+            if not re.fullmatch(r'[a-z_]+', key_entry):
+                messagebox.showerror("Error", "Ключ должен содержать только символы a-z и _")
+                return
             self.key_entry.delete(0, tk.END)
             self.key_entry.insert(0, key_entry)
 
